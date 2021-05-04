@@ -21,7 +21,10 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import com.example.sample.expenseTracker.exception.ApplicationException;abstract
+import com.example.sample.expenseTracker.exception.ApplicationException;
+import com.example.sample.expenseTracker.exception.ConstraintViolation;
+import com.example.sample.expenseTracker.exception.UnauthorizedException;
+import com.example.sample.expenseTracker.web.ErrorResponse;abstract
 
 @ControllerAdvice
 public class GlobalControllerExceptionHandler {
@@ -38,22 +41,6 @@ public class GlobalControllerExceptionHandler {
 	        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
 	    }
 
-	    @ExceptionHandler(ConstraintViolationException.class)
-	    public ResponseEntity<ErrorResponse> handleMethodConstraintViolationException(
-	            ConstraintViolationException ex) {
-	        logger.info("Constraint violation exception", ex);
-
-	        Map<String, Object> errorMap = new HashMap<>();
-	        for (ConstraintViolation<?> constraintViolation : ex
-	                .getConstraintViolations()) {
-	            errorMap.put(constraintViolation.getPropertyPath().toString(),
-	                    constraintViolation.getMessage());
-	        }
-
-	        ErrorResponse errorResponse = new ErrorResponse();
-	        errorResponse.setErrorFields(errorMap);
-	        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-	    }
 
 	    @ExceptionHandler(MethodArgumentNotValidException.class)
 	    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(
@@ -132,50 +119,6 @@ public class GlobalControllerExceptionHandler {
 	        errorResponse.setErrorMessage(ex.getMessage());
 
 	        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-	    }
-
-	    @ExceptionHandler(InvalidPasswordException.class)
-	    public ResponseEntity<ErrorResponse> handleAGCBaseException(
-	    		InvalidPasswordException ex) {
-
-	        logger.warn("InvalidPasswordException Support Code: [{}]",
-	                ex.getSupportCode());
-	        logger.warn("InvalidPasswordException", ex);
-
-	        ErrorResponse errorResponse = new ErrorResponse();
-	        errorResponse.setErrorMessage(ex.getSupportMessage());
-	        errorResponse.setErrorCode(ex.getSupportCode());
-	        return new ResponseEntity<>(errorResponse,
-	                HttpStatus.INTERNAL_SERVER_ERROR);
-	    }
-	    @ExceptionHandler(InvalidUserAccountException.class)
-	    public ResponseEntity<ErrorResponse> handleAGCBaseException(
-	    		InvalidUserAccountException ex) {
-
-	        logger.warn("InvalidUserAccountException Support Code: [{}]",
-	                ex.getSupportCode());
-	        logger.warn("InvalidUserAccountException", ex);
-
-	        ErrorResponse errorResponse = new ErrorResponse();
-	        errorResponse.setErrorMessage(ex.getSupportMessage());
-	        errorResponse.setErrorCode(ex.getSupportCode());
-	        return new ResponseEntity<>(errorResponse,
-	                HttpStatus.INTERNAL_SERVER_ERROR);
-	    }
-	    
-	    @ExceptionHandler(ApplicationException.class)
-	    public ResponseEntity<ErrorResponse> handleAGCBaseException(
-	            ApplicationException ex) {
-
-	        logger.error("ApplicationException Support Code: [{}]",
-	                ex.getSupportCode());
-	        logger.error("ApplicationException", ex);
-
-	        ErrorResponse errorResponse = new ErrorResponse();
-	        errorResponse.setErrorMessage(ex.getSupportMessage());
-	        errorResponse.setErrorCode(ex.getSupportCode());
-	        return new ResponseEntity<>(errorResponse,
-	                HttpStatus.INTERNAL_SERVER_ERROR);
 	    }
 
 	    @ExceptionHandler(RuntimeException.class)
