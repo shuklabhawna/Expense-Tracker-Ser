@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.sample.expenseTracker.exception.ApplicationException;
 import com.example.sample.expenseTracker.model.ExpenseType;
 import com.example.sample.expenseTracker.service.ExpenseTypeService;
 
@@ -59,9 +60,13 @@ public class ExpenseTypeController {
 	}
 
 	@DeleteMapping("/delete/{id}")
-	ResponseEntity<?> deleteExpenseType(@PathVariable Long id) {
-		expenseTypeService.delete(id);
-		return ResponseEntity.ok().build();
+	ResponseEntity<?> deleteExpenseType(@PathVariable Long id){
+		try{	
+			expenseTypeService.delete(id);
+			return ResponseEntity.ok().build();
+		}catch (Exception e) {
+			throw new ApplicationException(e.getMessage());
+		}
 
 	}
 }

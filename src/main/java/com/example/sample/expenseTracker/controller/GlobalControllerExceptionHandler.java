@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import javax.xml.bind.ValidationException;
 
-import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -20,14 +19,15 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.example.sample.expenseTracker.exception.ApplicationException;
-import com.example.sample.expenseTracker.exception.ConstraintViolation;
 import com.example.sample.expenseTracker.exception.UnauthorizedException;
-import com.example.sample.expenseTracker.web.ErrorResponse;abstract
+import com.example.sample.expenseTracker.web.ErrorResponse;
+
 
 @ControllerAdvice
-public class GlobalControllerExceptionHandler {
+public class GlobalControllerExceptionHandler{
 	private final Logger logger = LoggerFactory
             .getLogger(GlobalControllerExceptionHandler.class);
 
@@ -144,6 +144,18 @@ public class GlobalControllerExceptionHandler {
 	        ErrorResponse errorResponse = new ErrorResponse();
 	        errorResponse.setErrorMessage("System error occurred.");
 	        errorResponse.setErrorCode(errorCode.toString());
+	        return new ResponseEntity<>(errorResponse,
+	                HttpStatus.INTERNAL_SERVER_ERROR);
+	    }
+	    
+	    @ExceptionHandler(ApplicationException.class)
+	    public ResponseEntity<ErrorResponse> handleAGCBaseException(
+	            ApplicationException ex) {
+
+	        logger.error("ApplicationException", ex);
+
+	        ErrorResponse errorResponse = new ErrorResponse();
+	        errorResponse.setErrorMessage(ex.getMessage());
 	        return new ResponseEntity<>(errorResponse,
 	                HttpStatus.INTERNAL_SERVER_ERROR);
 	    }
